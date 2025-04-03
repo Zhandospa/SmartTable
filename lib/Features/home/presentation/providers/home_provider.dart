@@ -15,6 +15,7 @@ final menuRepositoryProvider = Provider<MenuRepository>((ref) {
 });
 
 final menuProvider = FutureProvider<List<MenuCategory>>((ref) async {
+  ref.keepAlive();
   return ref.watch(menuRepositoryProvider).getMenu();
 });
 
@@ -25,6 +26,7 @@ final dishRepositoryProvider = Provider<DishRepository>((ref) {
 });
 
 final dishProvider = FutureProvider.family<List<Dish>, int>((ref, categoryId) async {
+  ref.keepAlive();
   return await ref.watch(dishRepositoryProvider).getDishes(categoryId);
 });
 // Провайдер для BasketService
@@ -35,6 +37,7 @@ final basketRepositoryProvider = Provider((ref) {
   final service = ref.watch(basketServiceProvider);
   return BasketRepository(service);
 });
+final expandedCardProvider = StateProvider<int?>((ref) => null);
 
 
 

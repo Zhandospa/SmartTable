@@ -56,26 +56,22 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return CardContainer(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
           children: [
+            // Изображение блюда с иконкой info
             Stack(
               children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      width: double.infinity,
-                      constraints: BoxConstraints(minHeight: widget.isExpanded ? 135 : 135),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        image: const DecorationImage(
-                          image: AssetImage('images/dish.png'), // Локальный файл в папке assets
-                          fit: BoxFit.cover, // Подгоняет изображение
-                        ),
-                      ),
-                    ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    'images/dish.png',
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 Positioned(
                   top: 8,
                   right: 8,
@@ -87,41 +83,47 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
               ],
             ),
             const SizedBox(height: 8),
-            Expanded(
+
+            // Название блюда
+            Text(
+              widget.dish.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+
+            const SizedBox(height: 4),
+
+            // Цена блюда
+            Align(
+              alignment: Alignment.centerRight,
               child: Text(
-                widget.dish.name,
-                style: Theme.of(context).textTheme.titleLarge,
+                "${widget.dish.price.toStringAsFixed(0)} ₸",
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  "${widget.dish.price.toStringAsFixed(0)} ₸",
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-            ),
+
+            const SizedBox(height: 4),
+
+            // Анимированная часть
             SizeTransition(
               sizeFactor: _animation,
               axisAlignment: -1.0,
-              child: Column(
-                children: [
-                  IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        CounterWidget(
-                          quantity: widget.quantity,
-                          onIncrement: widget.onIncrement,
-                          onDecrement: widget.onDecrement,
-                        ),
-                        Expanded(
-                          child: AddButtonWidget(onAddToCart: widget.onAddToCart,),
-                        ),
-                      ],
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Row(
+                  children: [
+                    CounterWidget(
+                      quantity: widget.quantity,
+                      onIncrement: widget.onIncrement,
+                      onDecrement: widget.onDecrement,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: AddButtonWidget(onAddToCart: widget.onAddToCart),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
