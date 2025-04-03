@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:onay/Features/home/data/models/dish.dart';
 
 class DishService {
-  final String apiUrl = 'http://192.168.58.233:8080/api/dishes/';
+  final String apiUrl = 'http://192.168.110.28:8080/api/dishes/';
 
   Future<List<Dish>> fetchDishes(int categoryId) async {
     try {

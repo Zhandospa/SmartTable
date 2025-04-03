@@ -45,11 +45,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               CategorySelector(
                 categories: categories,
                 selectedIndex: selectedIndex,
-                onCategoryTap: (index) {
+                onCategorySelected: (i) {
                   setState(() {
-                    selectedIndex = index;
+                    selectedIndex = i;
                   });
-                  _pageController.jumpToPage(index);  // Переключаем страницу при клике на категорию
+                  _pageController.animateToPage(
+                    i,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.ease,
+                  );
                 },
               ),
               Expanded(

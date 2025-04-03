@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:onay/Features/home/presentation/providers/home_provider.dart';
 import 'package:onay/Features/home/presentation/widgets/flip_card.dart';
 
+
 class FoodScreen extends ConsumerWidget {
   final int categoryId;
   final String categoryTitle;
@@ -30,6 +31,9 @@ class FoodScreen extends ConsumerWidget {
           itemCount: dishes.length,
           itemBuilder: (context, index) => FlipCard(
             dish: dishes[index],
+            onCardTap: () {
+              ref.read(expandedCardProvider.notifier).state = dishes[index].id;
+            },
           ),
         ),
       ),

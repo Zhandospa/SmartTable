@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:onay/Features/home/data/models/menu_category.dart';
 
 class CategorySelector extends StatefulWidget {
-  final List categories;
+  final List<MenuCategory> categories;
   final int selectedIndex;
-  final ValueChanged<int> onCategoryTap;
+  final ValueChanged<int> onCategorySelected;
 
   const CategorySelector({
     super.key,
     required this.categories,
     required this.selectedIndex,
-    required this.onCategoryTap,
+    required this.onCategorySelected,
   });
 
   @override
@@ -18,7 +19,64 @@ class CategorySelector extends StatefulWidget {
 
 class _CategorySelectorState extends State<CategorySelector> {
   final ScrollController _scrollController = ScrollController();
-  final GlobalKey _rowKey = GlobalKey();
+  final List<GlobalKey> _itemKeys = [];
+  double _underlineLeft = 0;
+  double _underlineWidth = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _itemKeys.addAll(widget.categories.map((e) => GlobalKey()).toList());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _setUnderline());
+  }
+
+  @override
+  void didUpdateWidget(covariant CategorySelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedIndex != widget.selectedIndex) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _setUnderline());
+    }
+  }
+
+  void _setUnderline() {
+    if (_itemKeys.length <= widget.selectedIndex) return;
+
+    final key = _itemKeys[widget.selectedIndex];
+    final context = key.currentContext;
+    if (context == null) return;
+
+    final box = context.findRenderObject() as RenderBox;
+    final position = box.localToGlobal(Offset.zero, ancestor: context.findAncestorRenderObjectOfType<RenderBox>());
+
+    setState(() {
+      _underlineLeft = position.dx;
+      _underlineWidth = box.size.width;
+    });
+  }
+
+  void _onTap(int index) {
+    widget.onCategorySelected(index);
+    _scrollToIndex(index);
+  }
+
+  void _scrollToIndex(int index) {
+    if (_itemKeys.length <= index) return;
+
+    final key = _itemKeys[index];
+    final context = key.currentContext;
+    if (context == null) return;
+
+    final box = context.findRenderObject() as RenderBox;
+    final position = box.localToGlobal(Offset.zero, ancestor: context.findAncestorRenderObjectOfType<RenderBox>());
+    final offset = _scrollController.offset + position.dx - MediaQuery.of(context).size.width / 2 + box.size.width / 2;
+
+    _scrollController.animateTo(
+      offset.clamp(0, _scrollController.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,89 +84,41 @@ class _CategorySelectorState extends State<CategorySelector> {
       height: 50,
       child: Stack(
         children: [
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                height: 3,
-                color: Colors.grey[300],
-              ),
-            ),
-          ),
-          Center(
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                key: _rowKey,
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(widget.categories.length, (index) {
-                  final isSelected = widget.selectedIndex == index;
-                  return GestureDetector(
-                    onTap: () => widget.onCategoryTap(index),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            widget.categories[index].title,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              color: isSelected ? Colors.blue : Colors.black,
-                            ),
-                          ),
-                        ],
+          SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: List.generate(widget.categories.length, (index) {
+                return Padding(
+                  key: _itemKeys[index],
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: GestureDetector(
+                    onTap: () => _onTap(index),
+                    child: Text(
+                      widget.categories[index].title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: widget.selectedIndex == index ? FontWeight.bold : FontWeight.normal,
+                        color: widget.selectedIndex == index ? const Color.fromRGBO(0, 122, 255, 1): Colors.grey,
                       ),
                     ),
-                  );
-                }),
-              ),
+                  ),
+                );
+              }),
             ),
           ),
           AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 250),
             curve: Curves.easeInOut,
-            left: _calculateIndicatorPosition(widget.selectedIndex),
             bottom: 0,
-            child: Container(
-              height: 3,
-              width: _getTextWidth(widget.categories[widget.selectedIndex].title),
-              color: Colors.blue,
-            ),
+            left: _underlineLeft,
+            width: _underlineWidth,
+            height: 3,
+            child: Container(color:const Color.fromRGBO(0, 122, 255, 1),),
           ),
         ],
       ),
     );
-  }
-
-  double _calculateIndicatorPosition(int index) {
-    final RenderBox? rowBox = _rowKey.currentContext?.findRenderObject() as RenderBox?;
-    if (rowBox == null) return 0;
-
-    double leftOffset = 0;
-    for (int i = 0; i < index; i++) {
-      leftOffset += _getTextWidth(widget.categories[i].title) + 24;
-    }
-
-    // Определяем ширину строки и экрана
-    double rowWidth = rowBox.size.width;
-    double screenWidth = MediaQuery.of(context).size.width;
-
-    // Центрируем строку относительно экрана
-    double startOffset = (screenWidth - rowWidth) / 2;
-    double currentItemWidth = _getTextWidth(widget.categories[index].title);
-    print(index);
-    // Вычисляем центр текущего элемента
-    return startOffset + leftOffset + (currentItemWidth / 2) - (_getTextWidth(widget.categories[index].title) / 2) + 20 + index + (index - 1) * 6;
-  }
-
-  double _getTextWidth(String text) {
-    final TextPainter textPainter = TextPainter(
-      text: TextSpan(text: text, style: const TextStyle(fontSize: 16)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    return textPainter.width;
   }
 }

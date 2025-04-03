@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:onay/Features/home/data/models/menu_category.dart';
 
 class MenuService {
-  final String apiUrl = 'http://192.168.58.233:8080/api/menu';
+  final String apiUrl = 'http://192.168.110.28:8080/api/menu';
 
   Future<List<MenuCategory>> fetchMenu() async {
     try {
