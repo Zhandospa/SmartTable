@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:onay/Features/home/presentation/providers/home_provider.dart';
 import 'package:onay/Features/home/presentation/widgets/flip_card.dart';
 
-
-class FoodScreen extends ConsumerWidget {
+class FoodScreen extends ConsumerStatefulWidget {
   final int categoryId;
   final String categoryTitle;
 
@@ -15,8 +14,18 @@ class FoodScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final dishesAsync = ref.watch(dishProvider(categoryId));
+  ConsumerState<FoodScreen> createState() => _FoodScreenState();
+}
+
+class _FoodScreenState extends ConsumerState<FoodScreen> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // обязательно для сохранения состояния
+
+    final dishesAsync = ref.watch(dishProvider(widget.categoryId));
 
     return dishesAsync.when(
       data: (dishes) => Padding(

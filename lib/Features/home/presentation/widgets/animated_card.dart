@@ -63,19 +63,19 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
           children: [
             Stack(
               children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      width: double.infinity,
-                      constraints: BoxConstraints(minHeight: widget.isExpanded ? 135 : 135),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        image: const DecorationImage(
-                          image: AssetImage('images/dish.png'), // Локальный файл в папке assets
-                          fit: BoxFit.cover, // Подгоняет изображение
-                        ),
-                      ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  width: double.infinity,
+                  constraints: BoxConstraints(minHeight: widget.isExpanded ? 135 : 135),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    image: const DecorationImage(
+                      image: AssetImage('images/dish.png'),
+                      fit: BoxFit.cover,
                     ),
+                  ),
+                ),
                 Positioned(
                   top: 8,
                   right: 8,
@@ -87,19 +87,19 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
               ],
             ),
             const SizedBox(height: 8),
-            Expanded(
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
               child: Text(
                 widget.dish.name,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  "${widget.dish.price.toStringAsFixed(0)} ₸",
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+            const SizedBox(height: 4),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                "${widget.dish.price.toStringAsFixed(0)} ₸",
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
             SizeTransition(
@@ -107,6 +107,7 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
               axisAlignment: -1.0,
               child: Column(
                 children: [
+                  const SizedBox(height: 8),
                   IntrinsicHeight(
                     child: Row(
                       children: [
@@ -115,8 +116,11 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
                           onIncrement: widget.onIncrement,
                           onDecrement: widget.onDecrement,
                         ),
+                        const SizedBox(width: 8),
                         Expanded(
-                          child: AddButtonWidget(onAddToCart: widget.onAddToCart,),
+                          child: AddButtonWidget(
+                            onAddToCart: widget.onAddToCart,
+                          ),
                         ),
                       ],
                     ),

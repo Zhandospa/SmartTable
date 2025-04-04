@@ -51,7 +51,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   });
                   _pageController.animateToPage(
                     i,
-                    duration: const Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 800),
                     curve: Curves.ease,
                   );
                 },
