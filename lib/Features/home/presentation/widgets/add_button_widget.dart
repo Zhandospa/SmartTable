@@ -10,13 +10,13 @@ class AddButtonWidget extends StatelessWidget {
     return ElevatedButton(
       onPressed: onAddToCart,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color.fromRGBO(0, 122, 255, 1),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
       ),
       child: const Text(
-        "Добавить",
+        "Добавить в корзину",
         style: TextStyle(color: Colors.white),
       ),
     );

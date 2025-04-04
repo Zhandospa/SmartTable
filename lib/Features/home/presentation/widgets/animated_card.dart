@@ -67,7 +67,7 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                   width: double.infinity,
-                  constraints: BoxConstraints(minHeight: widget.isExpanded ? 135 : 135),
+                  constraints: BoxConstraints(minHeight: widget.isExpanded ? 200 : 240),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     image: const DecorationImage(

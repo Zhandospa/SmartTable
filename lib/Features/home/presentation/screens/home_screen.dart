@@ -6,6 +6,8 @@ import 'package:onay/Features/home/presentation/providers/home_provider.dart';
 import 'package:onay/Features/home/presentation/screens/food_screen.dart';
 import 'package:onay/Features/home/presentation/widgets/category_selector.dart';
 import 'package:onay/Features/home/presentation/widgets/home_app_bar.dart';
+import 'package:onay/Features/home/presentation/widgets/inactivity_wrapper.dart';
+
 @RoutePage()
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -35,49 +37,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final categoriesAsync = ref.watch(menuProvider);
     final totalPrice = ref.watch(totalPriceProvider).toStringAsFixed(0);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: HomeAppBar(totalPrice: totalPrice),
-      body: categoriesAsync.when(
-        data: (categories) {
-          return Column(
-            children: [
-              CategorySelector(
-                categories: categories,
-                selectedIndex: selectedIndex,
-                onCategorySelected: (i) {
-                  setState(() {
-                    selectedIndex = i;
-                  });
-                  _pageController.animateToPage(
-                    i,
-                    duration: const Duration(milliseconds: 800),
-                    curve: Curves.ease,
-                  );
-                },
-              ),
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (index) {
+    return InactivityWrapper(
+    timeout: const Duration(seconds: 10),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: HomeAppBar(totalPrice: totalPrice),
+        body: categoriesAsync.when(
+          data: (categories) {
+            return Column(
+              children: [
+                CategorySelector(
+                  categories: categories,
+                  selectedIndex: selectedIndex,
+                  onCategorySelected: (i) {
                     setState(() {
-                      selectedIndex = index;
+                      selectedIndex = i;
                     });
-                  },
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    return FoodScreen(
-                      categoryId: categories[index].id,
-                      categoryTitle: categories[index].title,
+                    _pageController.animateToPage(
+                      i,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.ease,
                     );
                   },
                 ),
-              ),
-            ],
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text("Ошибка загрузки: $error")),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        selectedIndex = index;
+                      });
+                    },
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      return FoodScreen(
+                        categoryId: categories[index].id,
+                        categoryTitle: categories[index].title,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) =>
+              Center(child: Text("Ошибка загрузки: $error")),
+        ),
       ),
     );
   }
