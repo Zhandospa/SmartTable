@@ -15,21 +15,10 @@ abstract class _$AppRouter extends RootStackRouter {
 
   @override
   final Map<String, PageFactory> pagesMap = {
-    BasketRoute.name: (routeData) {
+    BasketSwitcherRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const BasketScreen(),
-      );
-    },
-    FoodRoute.name: (routeData) {
-      final args = routeData.argsAs<FoodRouteArgs>();
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: FoodScreen(
-          key: args.key,
-          categoryId: args.categoryId,
-          categoryTitle: args.categoryTitle,
-        ),
+        child: const BasketSwitcherScreen(),
       );
     },
     HomeRoute.name: (routeData) {
@@ -39,80 +28,32 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     LoginRoute.name: (routeData) {
+      final args = routeData.argsAs<LoginRouteArgs>(
+          orElse: () => const LoginRouteArgs());
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: LoginScreen(),
+        child: LoginScreen(key: args.key),
+      );
+    },
+    MainRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const MainScreen(),
       );
     },
   };
 }
 
 /// generated route for
-/// [BasketScreen]
-class BasketRoute extends PageRouteInfo<void> {
-  const BasketRoute({List<PageRouteInfo>? children})
+/// [BasketSwitcherScreen]
+class BasketSwitcherRoute extends PageRouteInfo<void> {
+  const BasketSwitcherRoute({List<PageRouteInfo>? children})
       : super(
-          BasketRoute.name,
+          BasketSwitcherRoute.name,
           initialChildren: children,
         );
 
-  static const String name = 'BasketRoute';
-
-  static const PageInfo<void> page = PageInfo<void>(name);
-}
-
-/// generated route for
-/// [FoodScreen]
-class FoodRoute extends PageRouteInfo<FoodRouteArgs> {
-  FoodRoute({
-    Key? key,
-    required int categoryId,
-    required String categoryTitle,
-    List<PageRouteInfo>? children,
-  }) : super(
-          FoodRoute.name,
-          args: FoodRouteArgs(
-            key: key,
-            categoryId: categoryId,
-            categoryTitle: categoryTitle,
-          ),
-          initialChildren: children,
-        );
-
-  static const String name = 'FoodRoute';
-
-  static const PageInfo<FoodRouteArgs> page = PageInfo<FoodRouteArgs>(name);
-}
-
-class FoodRouteArgs {
-  const FoodRouteArgs({
-    this.key,
-    required this.categoryId,
-    required this.categoryTitle,
-  });
-
-  final Key? key;
-
-  final int categoryId;
-
-  final String categoryTitle;
-
-  @override
-  String toString() {
-    return 'FoodRouteArgs{key: $key, categoryId: $categoryId, categoryTitle: $categoryTitle}';
-  }
-}
-
-/// generated route for
-/// [ForExampleScreen]
-class ForExampleRoute extends PageRouteInfo<void> {
-  const ForExampleRoute({List<PageRouteInfo>? children})
-      : super(
-          ForExampleRoute.name,
-          initialChildren: children,
-        );
-
-  static const String name = 'ForExampleRoute';
+  static const String name = 'BasketSwitcherRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }
@@ -133,14 +74,42 @@ class HomeRoute extends PageRouteInfo<void> {
 
 /// generated route for
 /// [LoginScreen]
-class LoginRoute extends PageRouteInfo<void> {
-  const LoginRoute({List<PageRouteInfo>? children})
-      : super(
+class LoginRoute extends PageRouteInfo<LoginRouteArgs> {
+  LoginRoute({
+    Key? key,
+    List<PageRouteInfo>? children,
+  }) : super(
           LoginRoute.name,
+          args: LoginRouteArgs(key: key),
           initialChildren: children,
         );
 
   static const String name = 'LoginRoute';
+
+  static const PageInfo<LoginRouteArgs> page = PageInfo<LoginRouteArgs>(name);
+}
+
+class LoginRouteArgs {
+  const LoginRouteArgs({this.key});
+
+  final Key? key;
+
+  @override
+  String toString() {
+    return 'LoginRouteArgs{key: $key}';
+  }
+}
+
+/// generated route for
+/// [MainScreen]
+class MainRoute extends PageRouteInfo<void> {
+  const MainRoute({List<PageRouteInfo>? children})
+      : super(
+          MainRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'MainRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }

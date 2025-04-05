@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:onay/Features/home/data/models/menu_category.dart';
 
-class CategorySelector extends StatefulWidget {
-  final List<MenuCategory> categories;
+class CategorySelector<T> extends StatefulWidget {
+  final List<T> categories;
   final int selectedIndex;
   final ValueChanged<int> onCategorySelected;
+  final String Function(T) titleBuilder;
 
   const CategorySelector({
     super.key,
     required this.categories,
     required this.selectedIndex,
     required this.onCategorySelected,
+    required this.titleBuilder,
   });
 
   @override
-  State<CategorySelector> createState() => _CategorySelectorState();
+  State<CategorySelector<T>> createState() => _CategorySelectorState<T>();
 }
 
-class _CategorySelectorState extends State<CategorySelector> {
+class _CategorySelectorState<T> extends State<CategorySelector<T>> {
   final ScrollController _scrollController = ScrollController();
   final List<GlobalKey> _itemKeys = [];
   double _underlineLeft = 0;
@@ -27,12 +28,11 @@ class _CategorySelectorState extends State<CategorySelector> {
   void initState() {
     super.initState();
     _itemKeys.addAll(widget.categories.map((e) => GlobalKey()).toList());
-
     WidgetsBinding.instance.addPostFrameCallback((_) => _setUnderline());
   }
 
   @override
-  void didUpdateWidget(covariant CategorySelector oldWidget) {
+  void didUpdateWidget(covariant CategorySelector<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedIndex != widget.selectedIndex) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _setUnderline());
@@ -47,7 +47,10 @@ class _CategorySelectorState extends State<CategorySelector> {
     if (context == null) return;
 
     final box = context.findRenderObject() as RenderBox;
-    final position = box.localToGlobal(Offset.zero, ancestor: context.findAncestorRenderObjectOfType<RenderBox>());
+    final position = box.localToGlobal(
+      Offset.zero,
+      ancestor: context.findAncestorRenderObjectOfType<RenderBox>(),
+    );
 
     setState(() {
       _underlineLeft = position.dx;
@@ -68,7 +71,10 @@ class _CategorySelectorState extends State<CategorySelector> {
     if (context == null) return;
 
     final box = context.findRenderObject() as RenderBox;
-    final position = box.localToGlobal(Offset.zero, ancestor: context.findAncestorRenderObjectOfType<RenderBox>());
+    final position = box.localToGlobal(
+      Offset.zero,
+      ancestor: context.findAncestorRenderObjectOfType<RenderBox>(),
+    );
     final offset = _scrollController.offset + position.dx - MediaQuery.of(context).size.width / 2 + box.size.width / 2;
 
     _scrollController.animateTo(
@@ -81,7 +87,7 @@ class _CategorySelectorState extends State<CategorySelector> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 50,
+      height: 30,
       child: Stack(
         children: [
           SingleChildScrollView(
@@ -90,17 +96,20 @@ class _CategorySelectorState extends State<CategorySelector> {
             physics: const BouncingScrollPhysics(),
             child: Row(
               children: List.generate(widget.categories.length, (index) {
+                final title = widget.titleBuilder(widget.categories[index]);
                 return Padding(
                   key: _itemKeys[index],
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: GestureDetector(
                     onTap: () => _onTap(index),
                     child: Text(
-                      widget.categories[index].title,
+                      title,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: widget.selectedIndex == index ? FontWeight.bold : FontWeight.normal,
-                        color: widget.selectedIndex == index ? const Color.fromRGBO(0, 122, 255, 1): Colors.grey,
+                        color: widget.selectedIndex == index
+                            ? const Color.fromRGBO(0, 122, 255, 1)
+                            : Colors.grey,
                       ),
                     ),
                   ),
@@ -115,7 +124,9 @@ class _CategorySelectorState extends State<CategorySelector> {
             left: _underlineLeft,
             width: _underlineWidth,
             height: 3,
-            child: Container(color:const Color.fromRGBO(0, 122, 255, 1),),
+            child: Container(
+              color: const Color.fromRGBO(0, 122, 255, 1),
+            ),
           ),
         ],
       ),

@@ -19,7 +19,7 @@ class LoginScreen extends ConsumerWidget {
     if (authState is AuthSuccess) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         AuthService.isLoggedIn(override: true);
-        context.router.replace(const HomeRoute());
+        context.router.replace(const MainRoute());
       });
     }
 

@@ -3,6 +3,7 @@ import 'package:onay/Features/home/presentation/widgets/counter_widget.dart';
 import 'package:onay/Features/home/presentation/widgets/add_button_widget.dart';
 import 'package:onay/Features/home/presentation/widgets/icon_button_widget.dart';
 import 'package:onay/Features/home/presentation/widgets/card_container.dart';
+import 'package:onay/shared/utils/formatters.dart';
 
 class AnimatedCard extends StatefulWidget {
   final dynamic dish;
@@ -53,90 +54,102 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CardContainer(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final imageHeight = widget.isExpanded
+              ? constraints.maxHeight * 0.56
+              : constraints.maxHeight * 0.7;
+
+          return Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  width: double.infinity,
-                  constraints: BoxConstraints(minHeight: widget.isExpanded ? 200 : 240),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    image: const DecorationImage(
-                      image: AssetImage('images/dish.png'),
-                      fit: BoxFit.cover,
+                Stack(
+                  children: [
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      width: double.infinity,
+                      height: imageHeight,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'images/dish.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: IconButtonWidget(
+                        icon: Icons.info_outline,
+                        onTap: widget.onInfoTap,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    widget.dish.name,
+                    style: Theme.of(context).textTheme.titleLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: IconButtonWidget(
-                    icon: Icons.info_outline,
-                    onTap: widget.onInfoTap,
+                const SizedBox(height: 4),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+  "${formatPrice(widget.dish.price)} ₸",
+  style: Theme.of(context).textTheme.titleMedium,
+),
+
+                ),
+                SizeTransition(
+                  sizeFactor: _animation,
+                  axisAlignment: -1.0,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: CounterWidget(
+                              quantity: widget.quantity,
+                              onIncrement: widget.onIncrement,
+                              onDecrement: widget.onDecrement,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 1,
+                            child: AddButtonWidget(
+                              onAddToCart: widget.onAddToCart,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.only(top: 4.0),
-              child: Text(
-                widget.dish.name,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                "${widget.dish.price.toStringAsFixed(0)} ₸",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-            SizeTransition(
-              sizeFactor: _animation,
-              axisAlignment: -1.0,
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        CounterWidget(
-                          quantity: widget.quantity,
-                          onIncrement: widget.onIncrement,
-                          onDecrement: widget.onDecrement,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: AddButtonWidget(
-                            onAddToCart: widget.onAddToCart,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:onay/Features/home/presentation/providers/basket_provider.dart';
 import 'package:onay/shared/app_router.dart';
 import 'package:onay/shared/global_key.dart';
+import 'package:onay/shared/utils/formatters.dart';
 
 class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
   final String totalPrice;
@@ -14,49 +15,69 @@ class HomeAppBar extends ConsumerWidget implements PreferredSizeWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final itemCount = ref.watch(totalDish);
 
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text("Меню", style: TextStyle(fontSize: 18)),
-          ElevatedButton(
-            key: cartKey,
-            onPressed: () => context.router.push(const BasketRoute()),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromRGBO(0, 122, 255, 1),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0,0,0,10),
+      child: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Stack(
+          alignment: Alignment.center,
+          children: [
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Главный",
+                style: TextStyle(fontSize: 18),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.shopping_cart, color: Colors.white, size: 24), // Иконка корзины
-                const SizedBox(width: 8), // Отступ
-                  Text(
-                  '$itemCount', // Количество блюд
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+            Align(
+              alignment: Alignment.center,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: MediaQuery.of(context).size.width * 0.1,
+                  maxWidth: MediaQuery.of(context).size.width * 0.2,
+                ),
+                child: ElevatedButton(
+                  key: cartKey,
+                  onPressed: () => context.router.push(const BasketSwitcherRoute()),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(0, 122, 255, 1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                ), 
-                const SizedBox(width: 8), // Отступ
-                Text( totalPrice == '0'?'         0₸':
-                  "$totalPrice ₸",
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      const Icon(Icons.shopping_cart, color: Colors.white, size: 24),
+                      const SizedBox(width: 8),
+                      Text(
+                        '$itemCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        totalPrice == '0'
+                            ? '0 ₸'
+                            : "${formatPrice(int.tryParse(totalPrice.replaceAll(' ', '')) ?? 0)} ₸",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-          const SizedBox()
-        ],
+          ],
+        ),
       ),
     );
   }

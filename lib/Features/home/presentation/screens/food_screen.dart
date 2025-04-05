@@ -28,22 +28,20 @@ class _FoodScreenState extends ConsumerState<FoodScreen> with AutomaticKeepAlive
     final dishesAsync = ref.watch(dishProvider(widget.categoryId));
 
     return dishesAsync.when(
-      data: (dishes) => Padding(
-        padding: const EdgeInsets.all(10),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1,
-          ),
-          itemCount: dishes.length,
-          itemBuilder: (context, index) => FlipCard(
-            dish: dishes[index],
-            onCardTap: () {
-              ref.read(expandedCardProvider.notifier).state = dishes[index].id;
-            },
-          ),
+      data: (dishes) => GridView.builder(
+        padding: const EdgeInsets.all(20),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 1,
+        ),
+        itemCount: dishes.length,
+        itemBuilder: (context, index) => FlipCard(
+          dish: dishes[index],
+          onCardTap: () {
+            ref.read(expandedCardProvider.notifier).state = dishes[index].id;
+          },
         ),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
