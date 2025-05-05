@@ -34,6 +34,22 @@ class _CategorySelectorState<T> extends State<CategorySelector<T>> {
   @override
   void didUpdateWidget(covariant CategorySelector<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    // 🧠 Обновить itemKeys если количество категорий изменилось
+    if (oldWidget.categories.length != widget.categories.length) {
+      _itemKeys
+        ..clear()
+        ..addAll(widget.categories.map((e) => GlobalKey()).toList());
+    }
+
+    // 🛡 Безопасная проверка индекса
+    if (widget.selectedIndex >= widget.categories.length) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onCategorySelected(0);
+      });
+      return;
+    }
+
     if (oldWidget.selectedIndex != widget.selectedIndex) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _setUnderline());
     }
@@ -75,7 +91,11 @@ class _CategorySelectorState<T> extends State<CategorySelector<T>> {
       Offset.zero,
       ancestor: context.findAncestorRenderObjectOfType<RenderBox>(),
     );
-    final offset = _scrollController.offset + position.dx - MediaQuery.of(context).size.width / 2 + box.size.width / 2;
+
+    final offset = _scrollController.offset +
+        position.dx -
+        MediaQuery.of(context).size.width / 2 +
+        box.size.width / 2;
 
     _scrollController.animateTo(
       offset.clamp(0, _scrollController.position.maxScrollExtent),
@@ -106,7 +126,9 @@ class _CategorySelectorState<T> extends State<CategorySelector<T>> {
                       title,
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: widget.selectedIndex == index ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: widget.selectedIndex == index
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                         color: widget.selectedIndex == index
                             ? const Color.fromRGBO(0, 122, 255, 1)
                             : Colors.grey,

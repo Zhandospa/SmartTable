@@ -1,38 +1,28 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
-import '../data/repository.dart';
+import 'package:onay/Features/Auth/data/auth_repository.dart';
+import 'package:onay/shared/utils/session_provider.dart';
 import 'auth_state.dart';
 
-final logger = Logger();
-
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(ref.read(authRepositoryProvider));
+  return AuthNotifier(ref);
 });
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  final AuthRepository _authRepository;
+  final Ref ref;
 
-  AuthNotifier(this._authRepository) : super(AuthInitial()){
-    logger.i("Приложение запущено, начальное состояние:$AuthInitial");
+  AuthNotifier(this.ref) : super(AuthInitial());
+
+Future<void> login(String code) async {
+  state = AuthLoading();
+
+  final repo = ref.read(authRepositoryProvider);
+  final role = await repo.login(code);
+
+  if (role != null) {
+    ref.read(sessionProvider.notifier).state = code; // сохранили sessionId
+    state = AuthSuccess(role, code);
+  } else {
+    state = AuthError("Неверный код");
   }
-
-  Future<void> login(String password) async {
-    state = AuthLoading();
-    logger.i("Пользватель вводит пароль");
-
-    try {
-      final succes = await _authRepository.login(password);
-      if(succes){
-        state = AuthSuccess();
-        logger.i("Auth Succes");
-      }else{
-        state = AuthError("Неправильный пароль");
-        logger.w("Ошибка:Неправильный пароль");
-      }
-
-      }catch(e){
-      state = AuthError("Ошибка сети: $e");
-      logger.e("Ошибка сети: $e");
-    }
-  }
+}
 }

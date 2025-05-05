@@ -17,7 +17,7 @@ Future<void> startKioskMode() async {
 
 Future<void> setFullScreen() async {
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     systemNavigationBarColor: Colors.black,
     systemNavigationBarContrastEnforced: false,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:onay/Core/%D1%81onfig.dart';
 import 'package:onay/Features/home/presentation/widgets/counter_widget.dart';
 import 'package:onay/Features/home/presentation/widgets/add_button_widget.dart';
 import 'package:onay/Features/home/presentation/widgets/icon_button_widget.dart';
@@ -46,10 +48,12 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
   @override
   void didUpdateWidget(covariant AnimatedCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.isExpanded) {
-      _controller.forward();
-    } else {
-      _controller.reverse();
+    if (widget.dish.isActive) {
+      if (widget.isExpanded) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
     }
   }
 
@@ -64,8 +68,11 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
     return CardContainer(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final imageHeight = widget.isExpanded
-              ? constraints.maxHeight * 0.56
+          final bool available = widget.dish.isActive;
+          final double imageHeight = available
+              ? (widget.isExpanded
+                  ? constraints.maxHeight * 0.56
+                  : constraints.maxHeight * 0.7)
               : constraints.maxHeight * 0.7;
 
           return Padding(
@@ -82,20 +89,55 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
                       height: imageHeight,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          'images/dish.png',
-                          fit: BoxFit.cover,
+                        child: Stack(
+                          children: [
+                            (widget.dish.imageUrl != null && widget.dish.imageUrl!.trim().isNotEmpty)
+                                ? CachedNetworkImage(
+                                    imageUrl: '${Config.baseUrl}${widget.dish.imageUrl!}',
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                                    errorWidget: (context, url, error) => Image.asset(
+                                      'images/dish${widget.dish.id % 4}.png',
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                  )
+                                : Image.asset(
+                                    'images/dish${widget.dish.id % 4}.png',
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  ),
+                            if (!available)
+                              Container(
+                                color: Colors.black.withOpacity(0.5),
+                                child: const Center(
+                                  child: Text(
+                                    "Закончилось",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: IconButtonWidget(
-                        icon: Icons.info_outline,
-                        onTap: widget.onInfoTap,
+                    if (available)
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: IconButtonWidget(
+                          icon: Icons.info_outline,
+                          onTap: widget.onInfoTap,
+                        ),
                       ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -112,39 +154,39 @@ class _AnimatedCardState extends State<AnimatedCard> with SingleTickerProviderSt
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-  "${formatPrice(widget.dish.price)} ₸",
-  style: Theme.of(context).textTheme.titleMedium,
-),
-
-                ),
-                SizeTransition(
-                  sizeFactor: _animation,
-                  axisAlignment: -1.0,
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: CounterWidget(
-                              quantity: widget.quantity,
-                              onIncrement: widget.onIncrement,
-                              onDecrement: widget.onDecrement,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 1,
-                            child: AddButtonWidget(
-                              onAddToCart: widget.onAddToCart,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                    "${formatPrice(widget.dish.price)} ₸",
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
+                if (available)
+                  SizeTransition(
+                    sizeFactor: _animation,
+                    axisAlignment: -1.0,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: CounterWidget(
+                                quantity: widget.quantity,
+                                onIncrement: widget.onIncrement,
+                                onDecrement: widget.onDecrement,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 1,
+                              child: AddButtonWidget(
+                                onAddToCart: widget.onAddToCart,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           );

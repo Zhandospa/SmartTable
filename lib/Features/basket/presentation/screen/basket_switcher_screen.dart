@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:onay/Features/basket/presentation/screen/basket_screen.dart';
+import 'package:onay/Features/basket/presentation/screen/ordered_screen.dart';
 import 'package:onay/Features/home/presentation/widgets/category_selector.dart';
 
 @RoutePage()
@@ -54,23 +55,12 @@ class _BasketSwitcherScreenState extends State<BasketSwitcherScreen> {
               onPageChanged: _onPageChanged,
               children: const [
                 BasketScreen(),
-                _OrderPlacedScreen(),
+                ConfirmedOrdersScreen(), // ✅ вот это главное
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _OrderPlacedScreen extends StatelessWidget {
-  const _OrderPlacedScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(''), // Можно заменить на "Ваш заказ оформлен"
     );
   }
 }

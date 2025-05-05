@@ -15,39 +15,44 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text("Главное меню"),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-      ),
-      body: Stack(
-        children: [
-          Center(
-            child: ElevatedButton(
-              onPressed: () => context.router.push(const HomeRoute()),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-                padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 100),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue,
+              Colors.purple,    // верхний левый   // нижний правый
+            ],
+          ),
+        ),
+        child: Stack(
+          children: [
+            Center(
+              child: ElevatedButton(
+                onPressed: () => context.router.push(const HomeRoute()),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(244, 0, 175, 1),
+                  padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 100),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  "Меню",
+                  style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),
-              child: const Text(
-                "Меню",
-                style: TextStyle(fontSize: 18, color: Colors.white),
-              ),
             ),
-          ),
 
-          // 🔐 Скрытая зона выхода (например, внизу справа)
-          const Positioned(
-            bottom: 24,
-            right: 1000,
-            child: SecretExitButton(),
-          ),
-        ],
+            // 🔐 Скрытая зона выхода (например, внизу справа)
+            const Positioned(
+              bottom: 24,
+              right: 16,
+              child: SecretExitButton(),
+            ),
+          ],
+        ),
       ),
     );
   }

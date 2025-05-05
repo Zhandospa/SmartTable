@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:onay/Features/home/presentation/providers/basket_provider.dart';
 import 'package:onay/Features/home/presentation/providers/home_provider.dart';
+import 'package:onay/Features/home/presentation/providers/websocket_listener.dart';
 import 'package:onay/Features/home/presentation/screens/food_screen.dart';
 import 'package:onay/Features/home/presentation/widgets/category_selector.dart';
 import 'package:onay/Features/home/presentation/widgets/home_app_bar.dart';
@@ -34,6 +35,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(stompWebSocketListenerProvider);
     final categoriesAsync = ref.watch(menuProvider);
     final totalPrice = ref.watch(totalPriceProvider).toStringAsFixed(0);
 
